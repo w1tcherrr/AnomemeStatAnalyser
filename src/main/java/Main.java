@@ -11,8 +11,8 @@ import java.util.concurrent.Executors;
 
 public class Main {
     public static void main(String[] args) throws IOException, JSONException {
-        String pathDirectory = "C:\\Users\\Misch\\Downloads\\Demos\\SINGLE\\ACS4\\PLAYOFFS";
-        String outputDirectory = "C:\\Users\\Misch\\Downloads\\Demos\\OUTPUT";
+        String pathDirectory = "<<DEMOPATH>>";
+        String outputDirectory = "<<OUTPUTPATH>>";
 
         // analyse files
         List<Path> filePaths = Utils.findFilesInDirectory(pathDirectory, ".dem");
