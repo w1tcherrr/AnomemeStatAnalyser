@@ -1,15 +1,9 @@
 package utils;
 
 import data.DataContainer;
-import data.entities.MapStatistic;
-import data.entities.PlayerMapStatistic;
-import data.entities.SinglePlayerStats;
-import data.entities.TeamMapStatistic;
+import data.entities.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DataFormatter {
@@ -113,18 +107,53 @@ public class DataFormatter {
 
         String headerFormat = "%-20s   MAPS  HLTV  K/A/D        +/-     ADR   KAST    HS%%  3k  4k  5k MVP  TK";
 
-        List<String> teamNames = dataContainer.getMapStatistics().stream().map(mapStatistic -> List.of(mapStatistic.getTeamAMapStatistic().getTeamName(), mapStatistic.getTeamBMapStatistic().getTeamName()))
-                .flatMap(Collection::stream).distinct().toList();
+        List<String> teamNames = DataUtils.getTeamNames(dataContainer);
 
         for (String teamName : teamNames) {
             List<String> teamPlayers = DataUtils.getPlayerNamesForTeam(dataContainer, teamName);
 
-            List<SinglePlayerStats> teamStats = fullStats.stream().filter(s -> teamPlayers.contains(s.name())).toList();
+            List<SinglePlayerStats> allPlayerStats = fullStats.stream().filter(s -> teamPlayers.contains(s.name())).toList();
+
+            SingleTeamStats singleTeamStats = DataUtils.getTeamStats(dataContainer, teamName);
 
             lines.add(String.format(headerFormat, teamName));
-            for (SinglePlayerStats playerStats : teamStats.stream().sorted(Comparator.comparingDouble(v -> -v.hltvRating())).toList()) {
+            for (SinglePlayerStats playerStats : allPlayerStats.stream().sorted(Comparator.comparingDouble(v -> -v.hltvRating())).toList()) {
                 lines.add(DataUtils.formatFullStats(playerStats));
             }
+
+            lines.add(String.format("Rounds, total: %2.2f%% - %d/%d, T:  %2.2f%% - %d/%d, CT:  %2.2f%% - %d/%d",
+                    singleTeamStats.getTotalWinPercentage(), singleTeamStats.getTotalRoundsWon(), singleTeamStats.getTotalRoundsPlayed(),
+                    singleTeamStats.getTotalTWinPercentage(), singleTeamStats.getTotalTRoundsWon(), singleTeamStats.getTotalTRounds(),
+                    singleTeamStats.getTotalCTWinPercentage(), singleTeamStats.getTotalCTRoundsWon(), singleTeamStats.getTotalCTRounds()
+            ));
+
+            lines.add("");
+            lines.add("");
+        }
+
+        return lines;
+    }
+
+    public static List<String> createTeamMapStats(DataContainer dataContainer) {
+        List<String> lines = new ArrayList<>();
+
+        List<String> teamNames = DataUtils.getTeamNames(dataContainer);
+
+        for (String teamName : teamNames) {
+            SingleTeamStats singleTeamStats = DataUtils.getTeamStats(dataContainer, teamName);
+
+            lines.add(teamName);
+
+            for (String map : singleTeamStats.getMapsPlayed().entrySet().stream().sorted(Comparator.comparingInt(v -> -v.getValue())).map(Map.Entry::getKey).toList()) {
+                lines.add(String.format("%s: played %d times, rounds total: %2.2f%% - %d/%d, T:  %2.2f%% - %d/%d, CT:  %2.2f%% - %d/%d",
+                        map, singleTeamStats.getMapsPlayed().get(map),
+                        singleTeamStats.getWinPercentage().get(map), singleTeamStats.getRoundsWon().get(map), singleTeamStats.getRoundsPlayed().get(map),
+                        singleTeamStats.getTWinPercentage().get(map), singleTeamStats.getTRoundsWon().get(map), singleTeamStats.getTRounds().get(map),
+                        singleTeamStats.getCtWinPercentage().get(map), singleTeamStats.getCtRoundsWon().get(map), singleTeamStats.getCtRounds().get(map)
+                ));
+            }
+
+            lines.add("");
             lines.add("");
         }
 

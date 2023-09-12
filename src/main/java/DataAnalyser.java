@@ -44,6 +44,7 @@ public class DataAnalyser {
         Utils.writeFile(outputDirectory, "EXPORT", "hltv_per_match_desc.txt", DataFormatter.createStatsSortedByHLTVRatingInSingleMatch(dataContainer));
         Utils.writeFile(outputDirectory, "EXPORT", "maps_played_desc.txt", DataFormatter.createMapsSortedByAmountPlayed(dataContainer));
         Utils.writeFile(outputDirectory, "EXPORT", "team_stats.txt", DataFormatter.createTeamStats(dataContainer));
-        Utils.writeFile(outputDirectory, "EXPORT", "map_stats.txt", DataFormatter.createSingleMapStats(dataContainer));
+        Utils.writeFile(outputDirectory, "EXPORT", "single_map_stats.txt", DataFormatter.createSingleMapStats(dataContainer));
+        Utils.writeFile(outputDirectory, "EXPORT", "team_map_stats.txt", DataFormatter.createTeamMapStats(dataContainer));
     }
 }

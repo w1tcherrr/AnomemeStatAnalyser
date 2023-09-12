@@ -1,8 +1,10 @@
 package utils;
 
 import data.DataContainer;
+import data.entities.MapStatistic;
 import data.entities.PlayerMapStatistic;
 import data.entities.SinglePlayerStats;
+import data.entities.SingleTeamStats;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -136,6 +138,19 @@ public class DataUtils {
         sb.append("   ");
         sb.append(tks);
         return sb.toString();
+    }
+
+    public static SingleTeamStats getTeamStats(DataContainer dataContainer, String teamName) {
+        return new SingleTeamStats(dataContainer, teamName);
+    }
+
+    public static List<String> getTeamNames(DataContainer dataContainer) {
+        return dataContainer.getMapStatistics().stream().map(mapStatistic -> List.of(mapStatistic.getTeamAMapStatistic().getTeamName(), mapStatistic.getTeamBMapStatistic().getTeamName()))
+                .flatMap(Collection::stream).distinct().toList();
+    }
+
+    public static List<String> getMaps(DataContainer dataContainer) {
+        return dataContainer.getMapStatistics().stream().map(MapStatistic::getMapName).distinct().toList();
     }
 
     abstract static class ValueProvider<T, U> {
