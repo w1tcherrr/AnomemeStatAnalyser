@@ -29,10 +29,11 @@ public class DataAnalyser {
 
         for (Path path : jsonFiles) {
             File file = path.toFile();
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String jsonString = br.lines().collect(Collectors.joining("\r\n"));
-            JSONObject obj = new JSONObject(jsonString);
-            dataContainer.add(obj);
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String jsonString = br.lines().collect(Collectors.joining("\r\n"));
+                JSONObject obj = new JSONObject(jsonString);
+                dataContainer.add(obj);
+            }
         }
 
         Utils.writeFile(outputDirectory, "EXPORT", "kd.txt", DataFormatter.createStatsSortedByKD(dataContainer));

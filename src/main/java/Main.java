@@ -1,10 +1,13 @@
+import lombok.SneakyThrows;
 import org.json.JSONException;
 import utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +32,21 @@ public class Main {
         // analyse data
         DataAnalyser dataAnalyser = new DataAnalyser(outputDirectory);
         dataAnalyser.run();
+
+        deleteFiles(outputDirectory);
+    }
+
+    @SneakyThrows
+    private static void deleteFiles(String outputDirectory) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(outputDirectory))) {
+            for (Path file : stream) {
+                if (Files.isRegularFile(file)) {
+                    Files.delete(file);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static boolean isExported(String outputDirectory, Path path) {
